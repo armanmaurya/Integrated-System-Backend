@@ -58,6 +58,15 @@ def addIssuedBook(issued_books):
 
     return books
 
+class StudentNameView(APIView):
+    def get(self, request):
+        result = student.all()
+        serializer = StudentSerializer(result, many=True)
+
+        data = serializer.data
+        names = set([student['name'] for student in data])
+        return Response(names)
+
 class BookView(APIView):
     def get(self, request):
         # Get All Books in array
