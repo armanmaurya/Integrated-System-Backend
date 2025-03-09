@@ -16,7 +16,7 @@ class QueryView(APIView):
         grade = request.GET.get('grade')
         studentId = request.GET.get('studentid')
         name = request.GET.get('name')
-        author = request.GET.get('author')
+        book = request.GET.get('book')
         status = request.GET.get('status')
 
         newData = []
@@ -35,8 +35,8 @@ class QueryView(APIView):
         data = serializer.data
         for sutdent in data:
             issued_books_filters = {'student_id': sutdent['id']}
-            if author:
-                issued_books_filters['book__author__icontains'] = author  # Filter by author if given
+            if book:
+                issued_books_filters['book__title__icontains'] = book  # Filter by author if given
             if status:
                 issued_books_filters['status'] = status  # Filter by status if given
 
@@ -60,8 +60,21 @@ def addIssuedBook(issued_books):
 
 class BookView(APIView):
     def get(self, request):
-        query = request.GET.get('q')
+        # Get All Books in array
+        result = book.all()
+        serializer = BookSerializer(result, many=True)
 
-        result = book.get(id=query)
-        serializer = BookSerializer(result)
-        return Response(serializer.data)
+        # Construct Array of Names
+        data = serializer.data
+
+        names = set([book['title'] for book in data])
+        return Response(names)
+    
+
+# class AuthorView(APIView):
+#     def get(self, request):
+#         result = book.all()
+#         # Get all the authors
+#         authors = set([book.author for book in result])
+
+#         return Response(authors)
